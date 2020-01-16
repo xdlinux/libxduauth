@@ -18,5 +18,8 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
     ],
     python_requires='>=3.5',
-    install_requires=["requests"],
+    install_requires=["requests", "Pillow", "bs4"],
+    package_data={
+        "libxduauth": ["*.traineddata"],
+    },
 )
