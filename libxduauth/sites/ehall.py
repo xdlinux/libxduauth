@@ -5,7 +5,7 @@ import re
 class EhallSession(IDSSession):
     def __init__(self, username, password, *args, **kwargs):
         super().__init__(
-            'http://ehall.xidian.edu.cn:80//appShow',
+            'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html',
             username, password, *args, **kwargs
         )
         self.headers.update({

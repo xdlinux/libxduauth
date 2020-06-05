@@ -1,22 +1,22 @@
+from bs4 import BeautifulSoup
 from requests import Session
-import re
+
+from .._utils import parse_form_hidden_inputs
 
 
 class IDSSession(Session):
-    REGEX_HIDDEN_TAG = '<input type="hidden" name="(.*)" value="(.*)"'
-    REGEX_HTML_COMMENT = r'<!--\s*([\s\S]*?)\s*-->'
 
     def __init__(
-        self, target, username, password,
-        *args, **kwargs
+            self, target, username, password,
+            *args, **kwargs
     ):
-        super(IDSSession, self).__init__(*args, **kwargs)
+        super(IDSSession, self).__init__()
+        self.headers.update({'User-Agent': 'Mobile'})
         page = self.get(
             'http://ids.xidian.edu.cn/authserver/login',
             params={'service': target}
         ).text
-        page = re.sub(self.REGEX_HTML_COMMENT, '', page)
-        params = {i[0]: i[1] for i in re.findall(self.REGEX_HIDDEN_TAG, page)}
+        params = parse_form_hidden_inputs(BeautifulSoup(page, "lxml"))
         self.post(
             'http://ids.xidian.edu.cn/authserver/login',
             params={'service': target},
@@ -25,5 +25,3 @@ class IDSSession(Session):
                 'password': password
             })
         )
-
-    
