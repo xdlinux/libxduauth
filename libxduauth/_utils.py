@@ -29,30 +29,33 @@ def try_get_vcode(img):
 class Processor:
     def __init__(self, img):
         self.img = img.convert('L')
-        w, h = self.img.size
         self.img_arr = self.img.load()
-        self.visited = set()
-        sys.setrecursionlimit(w * h + 50)
         self.paint()
 
     DX = [1, 0, -1, 0]
     DY = [0, 1, 0, -1]
 
-    def paint(self, value=255, x=0, y=0):
-        if x < 0 or y < 0 or x >= self.img.size[0] or y >= self.img.size[1] or \
-                (x, y) in self.visited:
-            return False
-        self.visited.add((x, y))
-        for i in range(4):
-            try:
-                pixel = self.img_arr[x + self.DX[i], y + self.DY[i]]
-            except IndexError:
+    def paint(self):
+        w, h = self.img.size
+        visited = set()
+        q = []
+        q.append((0, 0, 255))
+        while q:
+            x, y, value = q.pop()
+            if x < 0 or y < 0 or x >= w or y >= h or \
+                    (x, y) in visited:
                 continue
-            if abs(pixel - self.img_arr[x, y]) > 10:
-                self.paint(255 - value, x + self.DX[i], y + self.DY[i])
-            else:
-                self.paint(value, x + self.DX[i], y + self.DY[i])
-        self.img_arr[x, y] = value
+            visited.add((x, y))
+            for i in range(4):
+                try:
+                    pixel = self.img_arr[x + self.DX[i], y + self.DY[i]]
+                except IndexError:
+                    continue
+                if abs(pixel - self.img_arr[x, y]) > 10:
+                    q.append((x + self.DX[i], y + self.DY[i], 255 - value))
+                else:
+                    q.append((x + self.DX[i], y + self.DY[i], value))
+            self.img_arr[x, y] = value
 
 
 def _process_vcode(img):
