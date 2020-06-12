@@ -12,10 +12,10 @@ class AuthSession(Session):
         super().__init__()
         self.cookies = http.cookiejar.LWPCookieJar(self.cookie_path)
         if not os.path.exists(self.cookie_path):
-            self.cookies.save()
-        self.cookies.load()
+            self.cookies.save(ignore_discard=True)
+        self.cookies.load(ignore_discard=True)
 
     def request(self, *args, **kwargs):
         ret = super().request(*args, **kwargs)
-        self.cookies.save()
+        self.cookies.save(ignore_discard=True)
         return ret
