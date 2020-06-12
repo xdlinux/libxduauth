@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from requests import Session
 
-from .._utils import parse_form_hidden_inputs
+from ..utils.page import parse_form_hidden_inputs
 
 
 class IDSSession(Session):

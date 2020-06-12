@@ -4,7 +4,8 @@ from PIL import Image
 from bs4 import BeautifulSoup
 
 from ..AuthSession import AuthSession
-from .._utils import _process_vcode, parse_form_hidden_inputs
+from ..utils.vcode import _process_vcode
+from ..utils.page import parse_form_hidden_inputs
 
 
 class RSBBSSession(AuthSession):

@@ -1,20 +1,14 @@
 import os
-import sys
-
-
-def parse_form_hidden_inputs(soup):
-    return {
-        item.get('name'): item.get('value', '')
-        for item in soup.findAll('input', type='hidden')
-    }
-
 
 def try_get_vcode(img):
     from pytesseract import pytesseract
     img = _process_vcode(img)
     try:
-        from importlib import resources
-        with resources.path(__package__, 'ar.traineddata') as pkg_path:
+        try:
+            from importlib.resources import path
+        except ImportError:
+            from importlib_resources import path
+        with path(__package__, os.path.join('assets', 'ar.traineddata')) as pkg_path:
             vcode = pytesseract.image_to_string(
                 img, lang='ar',
                 config="--psm 7 --tessdata-dir " +
@@ -51,7 +45,7 @@ class Processor:
                     pixel = self.img_arr[x + self.DX[i], y + self.DY[i]]
                 except IndexError:
                     continue
-                if abs(pixel - self.img_arr[x, y]) > 10:
+                if abs(pixel - self.img_arr[x, y]) > 5:
                     q.append((x + self.DX[i], y + self.DY[i], 255 - value))
                 else:
                     q.append((x + self.DX[i], y + self.DY[i], value))
