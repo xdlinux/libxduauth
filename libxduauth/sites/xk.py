@@ -1,10 +1,13 @@
+import base64
+import json
+import time
+from io import BytesIO
+
+import requests
+from PIL import Image
+
 from ..AuthSession import AuthSession
 from ..utils.des import encrypt
-from PIL import Image
-from io import BytesIO
-import time
-import base64
-import requests
 
 
 class XKSession(AuthSession):
@@ -13,6 +16,7 @@ class XKSession(AuthSession):
 
     def __init__(self, username, password):
         super().__init__('xk')
+        self.username = username
         cookies = requests.utils.dict_from_cookiejar(self.cookies)
         if 'token' in cookies:
             self.headers.update({'token': cookies['token']})
@@ -43,7 +47,7 @@ class XKSession(AuthSession):
         captcha_code = input('验证码：')
 
         login_resp = self.get(
-            self.BASE + '/student/check/login.do',
+            f'{self.BASE}/student/check/login.do',
             params={
                 'timestamp': int(time.time() * 1000),
                 'loginName': username,
@@ -58,6 +62,13 @@ class XKSession(AuthSession):
         return login_resp.json()['data']['token']
 
     def is_loggedin(self):
-        return self.get(self.BASE + '/publicinfo/onlineUsers.do', params={
-            'timestamp': int(time.time() * 1000),
-        }, allow_redirects=False).status_code == 200
+        try:
+            info = self.get(f'{self.BASE}/student/{self.username}.do', params={
+                'timestamp': int(time.time() * 1000),
+            }).json()
+        except json.JSONDecodeError:
+            return False
+        if info['code'] == '1':
+            self.info = info['data']
+            return True
+        return False
