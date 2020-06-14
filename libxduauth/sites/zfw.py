@@ -1,8 +1,7 @@
 import re
-import os
 
-from requests import Session
 from bs4 import BeautifulSoup
+from requests import Session
 
 
 class ZFWSession(Session):

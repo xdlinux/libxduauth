@@ -1,5 +1,6 @@
 import os
 
+
 def try_get_vcode(img):
     from pytesseract import pytesseract
     img = _process_vcode(img)

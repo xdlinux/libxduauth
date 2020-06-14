@@ -4,8 +4,8 @@ from PIL import Image
 from bs4 import BeautifulSoup
 
 from ..AuthSession import AuthSession
-from ..utils.vcode import _process_vcode
 from ..utils.page import parse_form_hidden_inputs
+from ..utils.vcode import _process_vcode
 
 
 class RSBBSSession(AuthSession):
@@ -25,11 +25,6 @@ class RSBBSSession(AuthSession):
         soup = BeautifulSoup(login.text, 'lxml')
 
         img = soup.find('img', {'class': 'seccodeimg'}).get('src')
-        # vcode = try_get_vcode(Image.open(
-        #     BytesIO(self.get(f'http://{self.HOST}/{img}', headers={
-        #         'Referer': login.url
-        #     }).content)
-        # )) # 暂时非常不准确
         img = _process_vcode(Image.open(
             BytesIO(self.get(f'http://{self.HOST}/{img}', headers={
                 'Referer': login.url

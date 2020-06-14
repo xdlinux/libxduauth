@@ -1,16 +1,16 @@
-import random
-import time
 import hashlib
 import json
+import random
+import time
 
 from requests import Session
 
 
 def _generate_uuid():
     a = [str(random.random())[2:10] for i in range(2)]
-    a = [a[i]+str(int(time.time() * 1000))[-10:] for i in range(2)]
+    a = [a[i] + str(int(time.time() * 1000))[-10:] for i in range(2)]
     a = [hex(int(a[i]))[2:10] for i in range(2)]
-    return "web"+a[0]+a[1]
+    return "web" + a[0] + a[1]
 
 
 class WXSession(Session):
@@ -21,7 +21,7 @@ class WXSession(Session):
         l.sort()
         s = ''
         for i in l:
-            s += i+'='+str(data[i])+'&'
+            s += i + '=' + str(data[i]) + '&'
         s = s[:-1]
         return hashlib.md5(s.encode('utf-8')).hexdigest()
 
@@ -61,9 +61,9 @@ class WXSession(Session):
             }),
             'secure': 0
         }
-        result = self.post(self.BASE+'baseCampus/login/login.do', json=data).json()
+        result = self.post(self.BASE + 'baseCampus/login/login.do', json=data).json()
         if result['isConfirm'] != 1:
             raise ConnectionError('登录失败')  # 请检查credentials.py
         self.headers.update({
-            'token': result['token'][0]+'_'+result['token'][1]
+            'token': result['token'][0] + '_' + result['token'][1]
         })

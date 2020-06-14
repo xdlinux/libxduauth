@@ -6,9 +6,9 @@ class EnergySession(Session):
 
     def __init__(self, username, password, *args, **kwargs):
         super(EnergySession, self).__init__(*args, **kwargs)
-        self.get(self.BASE+"/searchWap/Login.aspx")
+        self.get(self.BASE + "/searchWap/Login.aspx")
         self.post(
-            self.BASE+"/ajaxpro/SearchWap_Login,App_Web_fghipt60.ashx",
+            self.BASE + "/ajaxpro/SearchWap_Login,App_Web_fghipt60.ashx",
             json={
                 "webName": username,
                 "webPass": password
