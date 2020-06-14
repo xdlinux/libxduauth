@@ -1,16 +1,16 @@
 from bs4 import BeautifulSoup
-from requests import Session
 
+from ..AuthSession import AuthSession
 from ..utils.page import parse_form_hidden_inputs
 
 
-class IDSSession(Session):
+class IDSSession(AuthSession):
 
     def __init__(
             self, target, username, password,
             *args, **kwargs
     ):
-        super(IDSSession, self).__init__()
+        super(IDSSession, self).__init__('ids')
         self.headers.update({'User-Agent': 'Mobile'})
         page = self.get(
             'http://ids.xidian.edu.cn/authserver/login',

@@ -1,5 +1,5 @@
 from .ids import IDSSession
-import re
+from ..AuthSession import AuthSession
 
 
 class EhallSession(IDSSession):
@@ -8,6 +8,7 @@ class EhallSession(IDSSession):
             'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html',
             username, password, *args, **kwargs
         )
+        AuthSession.__init__(self, 'ehall')
         self.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
         })
