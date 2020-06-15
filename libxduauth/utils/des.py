@@ -1,3 +1,4 @@
+import functools
 kmap = [13, 16, 10, 23, 0, 4, 2, 27, 14, 5, 20, 9, 22, 18, 11, 3, 25, 7, 15, 6, 26, 19, 12, 1, 40,
         51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47, 43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31]
 pPermute = [15, 6, 19, 20, 28, 11, 27, 16, 0, 14, 22, 25, 4, 17, 30, 9,
@@ -5,23 +6,6 @@ pPermute = [15, 6, 19, 20, 28, 11, 27, 16, 0, 14, 22, 25, 4, 17, 30, 9,
 finalPermute = [39, 7, 47, 15, 55, 23, 63, 31, 38, 6, 46, 14, 54, 22, 62, 30, 37, 5, 45, 13, 53,
                 21, 61, 29, 36, 4, 44, 12, 52, 20, 60, 28, 35, 3, 43, 11, 51, 19, 59, 27, 34, 2,
                 42, 10, 50, 18, 58, 26, 33, 1, 41, 9, 49, 17, 57, 25, 32, 0, 40, 8, 48, 16, 56, 24]
-
-
-def xor(byteOne, byteTwo):
-    leng = len(byteOne)
-    xorByte = [0] * leng
-    for i in range(leng):
-        xorByte[i] = byteOne[i] ^ byteTwo[i]
-    return xorByte
-
-
-def expandPermute(rightData):
-    return [
-        rightData[(i * 4 + j + 31) % 32]
-        for i in range(8) for j in range(6)
-    ]
-
-
 sbox = [
     [[14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
         [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
@@ -58,6 +42,20 @@ sbox = [
 ]
 
 
+def xor(byteOne, byteTwo):
+    return [
+        byteOne[i] ^ byteTwo[i]
+        for i in range(len(byteOne))
+    ]
+
+
+def expandPermute(rightData):
+    return [
+        rightData[(i * 4 + j + 31) % 32]
+        for i in range(8) for j in range(6)
+    ]
+
+
 def sBoxPermute(expandByte):
     sBoxByte = ""
     for m in range(8):
@@ -69,63 +67,40 @@ def sBoxPermute(expandByte):
 
 
 def generateKeys(keyByte):
-    key = [0] * 56
-    keys = [[0] * 48 for i in range(16)]
     loop = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
-    for i in range(7):
-        k = 7
-        for j in range(8):
-            key[i * 8 + j] = keyByte[8 * k + i]
-            k -= 1
-    for i in range(16):
-        for j in range(loop[i]):
-            tempLeft = key[0]
-            tempRight = key[28]
-            for k in range(27):
-                key[k] = key[k + 1]
-                key[28 + k] = key[29 + k]
 
-            key[27] = tempLeft
-            key[55] = tempRight
-        for m in range(48):
-            keys[i][m] = key[kmap[m]]
+    key = [
+        keyByte[8 * (7 - j) + i]
+        for i in range(7) for j in range(8)
+    ]
+    keys = []
+    for i in range(16):
+        for _ in range(loop[i]):
+            key = key[1:28] + key[:1] + key[29:56] + key[28:29]
+        keys.append([key[m] for m in kmap])
     return keys
 
 
 def enc(data, keyByte):
     keys = generateKeys(keyByte)
-    ipByte = [0] * 64
-    for i in range(4):
-        k = 0
-        for j in range(7, -1, -1):
-            ipByte[i * 8 + k] = data[j * 8 + i * 2 + 1]
-            ipByte[i * 8 + k + 32] = data[j * 8 + i * 2]
-            k += 1
-    ipLeft = [0] * 32
-    ipRight = [0] * 32
-    tempLeft = [0] * 32
+    ipLeft = [
+        data[2 * i + 8 * (7 - j) + 1]
+        for i in range(4) for j in range(8)
+    ]
+    ipRight = [
+        data[2 * i + 8 * (7 - j)]
+        for i in range(4) for j in range(8)
+    ]
 
-    for k in range(32):
-        ipLeft[k] = ipByte[k]
-        ipRight[k] = ipByte[32 + k]
     for i in range(16):
-        for j in range(32):
-            tempLeft[j] = ipLeft[j]
-            ipLeft[j] = ipRight[j]
-        key = [0] * 48
-        for m in range(48):
-            key[m] = keys[i][m]
-        tp = sBoxPermute(xor(expandPermute(ipRight), key))
-        tempRight = xor(
+        tempLeft = ipLeft
+        ipLeft = ipRight
+        tp = sBoxPermute(xor(expandPermute(ipRight), keys[i]))
+        ipRight = xor(
             [tp[i] for i in pPermute],
             tempLeft
         )
-        for n in range(32):
-            ipRight[n] = tempRight[n]
-    finalData = [0] * 64
-    for i in range(32):
-        finalData[i] = ipRight[i]
-        finalData[32 + i] = ipLeft[i]
+    finalData = ipRight + ipLeft
 
     return [finalData[i] for i in finalPermute]
 
@@ -142,5 +117,14 @@ def encrypt(s, keys):
                     [int(i) for i in ''.join(
                         [f'{ord(i):016b}' for i in i.ljust(4, '\0')])]
                 )
-        result += f'{int("".join([str(i) for i in group]), 2):X}'
+        # result += f'{int("".join([str(i) for i in group]), 2):016X}'
+        result += f'{sum(c << i for i, c in enumerate(reversed(group))):016X}'
     return result
+
+
+if __name__ == '__main__':
+    import time
+    a = time.process_time()
+    for i in range(500):
+        encrypt('eoijrqo0324', ['this', 'password', 'is'])
+    print(time.process_time() - a)
