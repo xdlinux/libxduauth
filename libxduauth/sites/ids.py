@@ -12,7 +12,7 @@ class IDSSession(AuthSession):
             self, target, username, password,
             *args, **kwargs
     ):
-        super().__init__()
+        super().__init__(f'{self.cookie_name}_{username}')
         if self.is_logged_in():
             return
         else:

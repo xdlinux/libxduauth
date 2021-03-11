@@ -6,7 +6,7 @@ class EhallSession(IDSSession):
     cookie_name = 'ehall'
 
     def __init__(self, username, password, *args, **kwargs):
-        AuthSession.__init__(self)
+        AuthSession.__init__(self, f'{self.cookie_name}_{username}')
         if not self.is_logged_in():
             super().__init__(
                 'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html',

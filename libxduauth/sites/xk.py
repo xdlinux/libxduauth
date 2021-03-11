@@ -13,9 +13,10 @@ from ..utils.des import encrypt
 class XKSession(AuthSession):
     BASE = 'http://xk.xidian.edu.cn/xsxkapp/sys/xsxkapp'
     DESKeys = ['this', 'password', 'is']
+    cookie_name = 'xk'
 
     def __init__(self, username, password):
-        super().__init__('xk')
+        super().__init__(f'{self.cookie_name}_{username}')
         self.username = username
         cookies = requests.utils.dict_from_cookiejar(self.cookies)
         if 'token' in cookies:

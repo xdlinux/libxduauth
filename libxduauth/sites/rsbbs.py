@@ -10,9 +10,10 @@ from ..utils.vcode import _process_vcode
 
 class RSBBSSession(AuthSession):
     HOST = 'rsbbs.xidian.edu.cn'
+    cookie_name = 'rsbbs'
 
     def __init__(self, username, password):
-        super().__init__('rsbbs')
+        super().__init__(f'{self.cookie_name}_{username}')
         if not self.is_loggedin():
             self.login(username, password)
 
