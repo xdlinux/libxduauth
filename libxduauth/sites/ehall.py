@@ -3,15 +3,15 @@ from ..AuthSession import AuthSession
 
 
 class EhallSession(IDSSession):
+    cookie_name = 'ehall'
+
     def __init__(self, username, password, *args, **kwargs):
-        super().__init__(
-            'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html',
-            username, password, *args, **kwargs
-        )
-        AuthSession.__init__(self, 'ehall')
-        self.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
-        })
+        AuthSession.__init__(self)
+        if not self.is_logged_in():
+            super().__init__(
+                'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html',
+                username, password, *args, **kwargs
+            )
 
     def use_app(self, app_id):
         self.get('http://ehall.xidian.edu.cn//appShow', params={
@@ -39,3 +39,6 @@ class EhallSession(IDSSession):
             # warn('multiple results found, returning the first one')
             pass
         return search_result[0]['appId']
+
+    def is_logged_in(self):
+        return self.get('http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json').json()['hasLogin']

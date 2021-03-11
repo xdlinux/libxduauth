@@ -6,12 +6,13 @@ from ..utils.aes import encrypt
 
 
 class IDSSession(AuthSession):
+    cookie_name = 'ids'
 
     def __init__(
             self, target, username, password,
             *args, **kwargs
     ):
-        super(IDSSession, self).__init__('ids')
+        super().__init__()
         if self.is_logged_in():
             return
         else:
