@@ -5,3 +5,5 @@ from .sites.rsbbs import RSBBSSession
 from .sites.wx import WXSession
 from .sites.xk import XKSession
 from .sites.zfw import ZFWSession
+
+import libxduauth.utils.update
