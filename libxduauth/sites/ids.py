@@ -19,11 +19,12 @@ class IDSSession(AuthSession):
             self.cookies.clear()
         page = self.get(
             'http://ids.xidian.edu.cn/authserver/login',
-            params={'service': target}
+            params={'service': target, 'type': 'userNameLogin'}
         ).text
         page = BeautifulSoup(page, "lxml")
-        params = parse_form_hidden_inputs(page)
-        enc = page.find('input', id='pwdDefaultEncryptSalt').get('value')
+        form = page.findChild(attrs={'id': 'pwdFromId'})
+        params = parse_form_hidden_inputs(form)
+        enc = form.find('input', id='pwdEncryptSalt').get('value')
         self.post(
             'http://ids.xidian.edu.cn/authserver/login',
             params={'service': target},
