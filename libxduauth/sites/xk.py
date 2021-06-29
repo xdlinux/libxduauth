@@ -1,6 +1,7 @@
 import base64
 import json
 import time
+import simplejson
 from io import BytesIO
 
 import requests
@@ -59,6 +60,8 @@ class XKSession(AuthSession):
                 'vtoken': captcha_token
             }
         )
+        if '系统异常' in login_resp.text:
+            raise RuntimeError('选课系统异常，请稍后')
         print(login_resp.json()['msg'])
         return login_resp.json()['data']['token']
 
@@ -67,7 +70,7 @@ class XKSession(AuthSession):
             info = self.get(f'{self.BASE}/student/{self.username}.do', params={
                 'timestamp': int(time.time() * 1000),
             }).json()
-        except json.JSONDecodeError:
+        except (simplejson.errors.JSONDecodeError, json.JSONDecodeError):
             return False
         if info['code'] == '1':
             self.info = info['data']
