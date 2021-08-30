@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="libxduauth",
-    version="1.5.3",
+    version="1.5.5",
     author="Frank",
     author_email="frankli0324@hotmail.com",
     description="login utilities for XDU",
@@ -17,7 +17,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     install_requires=[
         "requests", "Pillow", "bs4", "pycryptodome",
         "pytesseract", "importlib-resources"

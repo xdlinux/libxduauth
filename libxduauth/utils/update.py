@@ -21,7 +21,8 @@ def get_latest_version(package, source='pypi.org'):
 
 
 try:
-    if get_self_version(package) != (latest := get_latest_version(package)):
+    latest = get_latest_version(package)
+    if get_self_version(package) != latest:
         warnings.warn(f'''
 You are not using the latest version of libxduauth({latest}).
 upgrade the package by running:
