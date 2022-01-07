@@ -1,78 +1,93 @@
-import base64
 import json
-import time
 import simplejson
+from base64 import b64encode, b64decode
 from io import BytesIO
+from re import search
 
 import requests
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
 from PIL import Image
 
 from ..AuthSession import AuthSession
-from ..utils.des import encrypt
+
+
+def encrypt(password, key):
+    if type(password) is str:
+        password = password.encode('utf-8')
+    if type(key) is str:
+        key = key.encode('utf-8')
+    crypt = AES.new(key, AES.MODE_ECB)
+    return b64encode(crypt.encrypt(pad(password, 16))).decode('utf-8')
 
 
 class XKSession(AuthSession):
-    BASE = 'http://xk.xidian.edu.cn/xsxkapp/sys/xsxkapp'
-    DESKeys = ['this', 'password', 'is']
+    BASE = 'http://xk.xidian.edu.cn/xsxk'
     cookie_name = 'xk'
+    user = {}
+    current_batch = {}
 
     def __init__(self, username, password):
         super().__init__(f'{self.cookie_name}_{username}')
         self.username = username
         cookies = requests.utils.dict_from_cookiejar(self.cookies)
-        if 'token' in cookies:
-            self.headers.update({'token': cookies['token']})
-        if 'token' not in cookies or not self.is_loggedin():
-            token = requests.cookies.create_cookie(
-                domain='xk.xidian.edu.cn', path='/nowhere',
-                name='token', value=self.login(username, password)
-            )
-            self.cookies.set_cookie(token)
+        if 'token' in cookies and 'batch' in cookies:
+            self.headers.update({'Authorization': cookies['token']})
+            self.current_batch = json.loads(cookies['batch'])
+        if 'token' not in cookies or 'batch' not in cookies or not self.is_loggedin():
+            self.persist('token', self.login(username, password))
+            self.current_batch = next(filter(
+                lambda batch: batch['canSelect'] == '1',
+                self.user['electiveBatchList']
+            ))
+            self.persist('batch', json.dumps(self.current_batch))
             cookies = requests.utils.dict_from_cookiejar(self.cookies)
-            self.headers.update({'token': cookies['token']})
-        self.token = cookies['token']
+            self.headers.update({'Authorization': cookies['token']})
+
+    def persist(self, name, value):
+        self.cookies.set_cookie(requests.cookies.create_cookie(
+            domain='xk.xidian.edu.cn', path='/nowhere',
+            name=name, value=value,
+        ))
         self.cookies.save(ignore_discard=True)
 
     def login(self, username, password):
-        resp = self.get(self.BASE + '/student/4/vcode.do',
-                        params={'timestamp': int(time.time() * 1000)})
-        captcha_token = resp.json()['data']['token']
+        self.headers.update({'Authorization': ''})
+        index = self.get(self.BASE + '/xsxk/profile/index.html').text
+        key = search(r'loginForm\.aesKey = "([a-zA-Z0-9=]*)";', index)
+        if not key:  # 应当不会出现 index.html 中没有 aeskey 的情况
+            raise RuntimeError('AES Key Not Found')
+        key = key.groups()[0]
+
+        resp = self.post(self.BASE + '/auth/captcha')
+        captcha = resp.json()['data']
 
         # show captcha
-        captcha_resp = self.get(
-            self.BASE + '/student/vcode/image.do',
-            params={'vtoken': captcha_token}
-        )
-        Image.open(BytesIO(captcha_resp.content)).show()
+        captcha_img = captcha['captcha'][22:]  # data:image/png;base64,
+        Image.open(BytesIO(b64decode(captcha_img))).show()
 
         # TODO:input function shouldn't exist here
         captcha_code = input('验证码：')
 
-        login_resp = self.get(
-            f'{self.BASE}/student/check/login.do',
-            params={
-                'timestamp': int(time.time() * 1000),
-                'loginName': username,
-                'loginPwd': base64.b64encode(
-                    encrypt(password, self.DESKeys).encode()
-                ).decode(),
-                'verifyCode': captcha_code,
-                'vtoken': captcha_token
-            }
-        )
-        if '系统异常' in login_resp.text:
-            raise RuntimeError('选课系统异常，请稍后')
-        print(login_resp.json()['msg'])
-        return login_resp.json()['data']['token']
+        login_resp = self.post(f'{self.BASE}/auth/login', data={
+            'loginname': username,
+            'password': encrypt(password, key),
+            'captcha': captcha_code,
+            'uuid': captcha['uuid']
+        }).json()
+        if login_resp['code'] != 200:
+            raise RuntimeError(login_resp['msg'])
+        self.user = login_resp['data']['student']
+        return login_resp['data']['token']
 
     def is_loggedin(self):
         try:
-            info = self.get(f'{self.BASE}/student/{self.username}.do', params={
-                'timestamp': int(time.time() * 1000),
+            info = self.post(f'{self.BASE}/elective/user', data={
+                'batchId': self.current_batch['code'],
             }).json()
         except (simplejson.errors.JSONDecodeError, json.JSONDecodeError):
             return False
-        if info['code'] == '1':
-            self.info = info['data']
+        if info['code'] == 200:
+            self.user = info['data']['student']
             return True
         return False
