@@ -1,26 +1,3 @@
-import os
-
-
-def try_get_vcode(img):
-    from pytesseract import pytesseract
-    img = _process_vcode(img)
-    try:
-        try:
-            from importlib.resources import path
-        except ImportError:
-            from importlib_resources import path
-        with path(__package__, os.path.join('assets', 'ar.traineddata')) as pkg_path:
-            vcode = pytesseract.image_to_string(
-                img, lang='ar',
-                config="--psm 7 --tessdata-dir " +
-                       os.path.dirname(pkg_path)
-            )
-    except:
-        vcode = pytesseract.image_to_string(
-            img, lang='eng', config="--psm 7")
-    return vcode
-
-
 class Processor:
     def __init__(self, img):
         self.img = img.convert('L')
