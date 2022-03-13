@@ -1,5 +1,4 @@
 import json
-import simplejson
 from base64 import b64encode, b64decode
 from io import BytesIO
 from re import search
@@ -22,7 +21,7 @@ def encrypt(password, key):
 
 
 class XKSession(AuthSession):
-    BASE = 'http://xk.xidian.edu.cn/xsxk'
+    BASE = 'https://xk.xidian.edu.cn/xsxk'
     cookie_name = 'xk'
     user = {}
     current_batch = {}
@@ -85,7 +84,7 @@ class XKSession(AuthSession):
             info = self.post(f'{self.BASE}/elective/user', data={
                 'batchId': self.current_batch['code'],
             }).json()
-        except (simplejson.errors.JSONDecodeError, json.JSONDecodeError):
+        except requests.JSONDecodeError:
             return False
         if info['code'] == 200:
             self.user = info['data']['student']

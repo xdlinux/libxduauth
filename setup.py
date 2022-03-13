@@ -19,11 +19,7 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=[
-        "requests", "Pillow", "bs4", "pycryptodome",
-        "pytesseract", "importlib-resources",
-        "pycryptodome", "simplejson"
+        "requests", "bs4", "pycryptodome",
+        "importlib-resources", "Pillow",
     ],
-    package_data={
-        "libxduauth": ["*.traineddata"],
-    },
 )
