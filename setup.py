@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="libxduauth",
-    version="1.5.5",
+    version="1.5.6",
     author="Frank",
     author_email="frankli0324@hotmail.com",
     description="login utilities for XDU",
@@ -21,7 +21,7 @@ setuptools.setup(
     install_requires=[
         "requests", "Pillow", "bs4", "pycryptodome",
         "pytesseract", "importlib-resources",
-        "pycryptodome"
+        "pycryptodome", "simplejson"
     ],
     package_data={
         "libxduauth": ["*.traineddata"],
