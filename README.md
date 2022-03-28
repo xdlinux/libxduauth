@@ -24,7 +24,7 @@ RSBBSSession  | <http://rsbbs.xidian.edu.cn>          | 睿思论坛（外网）
 WXSession     |                                       |
 XKSession     | <http://xk.xidian.edu.cn>             | 选课系统
 ZFWSession    | <https://zfw.xidian.edu.cn>           | 校园网流量购买/查询
-SportsSession | <https://xd.boxkj.com>                | 体适能查询
+SportsSession | <http://xd.5itsn.com>                 | 体适能查询
 
 ## 声明
 
