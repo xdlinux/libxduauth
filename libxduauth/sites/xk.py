@@ -25,6 +25,7 @@ class XKSession(AuthSession):
     cookie_name = 'xk'
     user = {}
     current_batch = {}
+    cnt=1
 
     def __init__(self, username, password):
         super().__init__(f'{self.cookie_name}_{username}')
@@ -35,13 +36,27 @@ class XKSession(AuthSession):
             self.current_batch = json.loads(cookies['batch'])
         if 'token' not in cookies or 'batch' not in cookies or not self.is_loggedin():
             self.persist('token', self.login(username, password))
-            self.current_batch = next(filter(
-                lambda batch: batch['canSelect'] == '1',
-                self.user['electiveBatchList']
-            ))
+            for i in self.user['electiveBatchList']:
+                print(str(self.cnt)+'、'+i['name'])
+                self.cnt+=1
+            num=int(input('选择轮次：'))
+            self.current_batch=self.user['electiveBatchList'][num-1]
+            while self.current_batch['canSelect'] != '1':
+                num=int(input('该轮次不可选，请重新选择：'))
+                self.current_batch=self.user['electiveBatchList'][num-1]
             self.persist('batch', json.dumps(self.current_batch))
             cookies = requests.utils.dict_from_cookiejar(self.cookies)
             self.headers.update({'Authorization': cookies['token']})
+            self.refresh_branch(self.current_batch['code'],self.headers['Authorization'])
+
+    def refresh_branch(self,id,Authorization):
+        cookies = {
+            'Authorization': Authorization,
+        }
+        params = {
+            'batchId': id,
+        }
+        self.get(self.BASE+'/elective/grablessons',cookies=cookies,params=params)
 
     def persist(self, name, value):
         self.cookies.set_cookie(requests.cookies.create_cookie(
