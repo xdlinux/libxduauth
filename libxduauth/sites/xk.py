@@ -27,7 +27,7 @@ class XKSession(AuthSession):
     current_batch = {}
     cnt=1
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, keyword=''):
         super().__init__(f'{self.cookie_name}_{username}')
         self.username = username
         cookies = requests.utils.dict_from_cookiejar(self.cookies)
@@ -36,14 +36,16 @@ class XKSession(AuthSession):
             self.current_batch = json.loads(cookies['batch'])
         if 'token' not in cookies or 'batch' not in cookies or not self.is_loggedin():
             self.persist('token', self.login(username, password))
-            for i in self.user['electiveBatchList']:
-                print(str(self.cnt)+'、'+i['name'])
-                self.cnt+=1
-            num=int(input('选择轮次：'))
-            self.current_batch=self.user['electiveBatchList'][num-1]
-            while self.current_batch['canSelect'] != '1':
-                num=int(input('该轮次不可选，请重新选择：'))
-                self.current_batch=self.user['electiveBatchList'][num-1]
+            if keyword != '':
+                for i in self.user['electiveBatchList']:
+                    if i['name']==keyword:
+                        self.current_batch=i
+            else:
+                for i in self.user['electiveBatchList']:
+                    if i['canSelect'] == '1':
+                        self.current_batch=i
+            if self.current_batch == '':
+                raise RuntimeError('轮次不存在或无可选轮次')
             self.persist('batch', json.dumps(self.current_batch))
             cookies = requests.utils.dict_from_cookiejar(self.cookies)
             self.headers.update({'Authorization': cookies['token']})
