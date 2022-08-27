@@ -22,7 +22,7 @@ EnergySession | <http://10.168.55.50:8088>            | 水表/电表查询
 IDSSession    | <http://ids.xidian.edu.cn/authserver> | 统一认证
 RSBBSSession  | <http://rsbbs.xidian.edu.cn>          | 睿思论坛（外网）
 WXSession     |                                       |
-XKSession     | <http://xk.xidian.edu.cn>             | 选课系统
+XKSession     | <https://xk.xidian.edu.cn>             | 选课系统
 ZFWSession    | <https://zfw.xidian.edu.cn>           | 校园网流量购买/查询
 SportsSession | <http://xd.5itsn.com>                 | 体适能查询
 

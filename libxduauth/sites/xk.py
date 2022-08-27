@@ -26,7 +26,7 @@ class XKSession(AuthSession):
     user = {}
     current_batch = {}
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, keyword=''):
         super().__init__(f'{self.cookie_name}_{username}')
         self.username = username
         cookies = requests.utils.dict_from_cookiejar(self.cookies)
@@ -36,11 +36,18 @@ class XKSession(AuthSession):
         if 'token' not in cookies or 'batch' not in cookies or not self.is_loggedin():
             self.persist('token', self.login(username, password))
             self.current_batch = next(filter(
-                lambda batch: batch['canSelect'] == '1',
+                lambda batch: (
+                    batch['canSelect'] == '1' and
+                    keyword in batch['name']
+                ),
                 self.user['electiveBatchList']
             ))
             self.persist('batch', json.dumps(self.current_batch))
             cookies = requests.utils.dict_from_cookiejar(self.cookies)
+            self.cookies.update({'Authorization': cookies['token']})
+            self.get(self.BASE + '/elective/grablessons', params={
+                'batchId': self.current_batch['code'],
+            })  # wierd, yet mandatory.
             self.headers.update({'Authorization': cookies['token']})
 
     def persist(self, name, value):
