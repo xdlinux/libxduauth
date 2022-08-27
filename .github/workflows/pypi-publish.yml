@@ -9,17 +9,17 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+    - master
 
 permissions:
   contents: read
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
-
+    environment: pypi publish
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
