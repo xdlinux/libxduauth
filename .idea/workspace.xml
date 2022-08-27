@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d948e498-0fd3-4ed6-9343-951761cdef9b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libxduauth/sites/xk.py" beforeDir="false" afterPath="$PROJECT_DIR$/libxduauth/sites/xk.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -101,7 +100,7 @@
       <option name="presentableId" value="Default" />
       <updated>1661438119176</updated>
       <workItem from="1661438123213" duration="4586000" />
-      <workItem from="1661560621219" duration="2223000" />
+      <workItem from="1661560621219" duration="2983000" />
     </task>
     <servers />
   </component>
