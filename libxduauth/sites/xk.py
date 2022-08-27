@@ -38,12 +38,12 @@ class XKSession(AuthSession):
             self.persist('token', self.login(username, password))
             if keyword != '':
                 for i in self.user['electiveBatchList']:
-                    if i['name']==keyword:
-                        self.current_batch=i
+                    if i['name'] == keyword:
+                        self.current_batch = i
             else:
                 for i in self.user['electiveBatchList']:
                     if i['canSelect'] == '1':
-                        self.current_batch=i
+                        self.current_batch = i
             if self.current_batch == '':
                 raise RuntimeError('轮次不存在或无可选轮次')
             self.persist('batch', json.dumps(self.current_batch))
@@ -51,7 +51,7 @@ class XKSession(AuthSession):
             self.headers.update({'Authorization': cookies['token']})
             self.refresh_branch(self.current_batch['code'],self.headers['Authorization'])
 
-    def refresh_branch(self,id,Authorization):
+    def refresh_branch(self, id, Authorization):
         cookies = {
             'Authorization': Authorization,
         }
