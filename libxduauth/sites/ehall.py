@@ -41,4 +41,7 @@ class EhallSession(IDSSession):
         return search_result[0]['appId']
 
     def is_logged_in(self):
-        return self.get('http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json').json()['hasLogin']
+        return self.get('http://ehall.xidian.edu.cn/jsonp/userFavoriteApps.json',
+                        headers={
+                            "Cookie": "route=7d88f93d9c668334ecfc2502d54b2b32; amp.locale=undefined"
+                        }).json()['hasLogin']
