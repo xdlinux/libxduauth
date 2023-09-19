@@ -6,7 +6,7 @@ from ..utils.rsa import rsa_encrypt_by_pkcs1
 
 
 class SportsSession(Session):
-    BASE_URL = 'http://xd.5itsn.com//app/'
+    BASE_URL = 'http://tybjxgl.xidian.edu.cn/app/'
 
     __RSA_PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4laolA7zAk7jzsqDb3O
