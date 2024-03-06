@@ -25,11 +25,11 @@ class IDSSession(AuthSession):
             'http://ids.xidian.edu.cn/authserver/login',
             params={'service': target}
         ).text
-	is_need_captcha = self.get(
+        is_need_captcha = self.get(
             'https://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl',
             params={'username': username, '_': str(int(time.time() * 1000))}
         ).json()['isNeed']
-	if is_need_captcha:
+        if is_need_captcha:
             captcha = self.get(
                 'https://ids.xidian.edu.cn/authserver/common/openSliderCaptcha.htl',
                 params={'_': str(int(time.time() * 1000))}
@@ -56,7 +56,7 @@ class IDSSession(AuthSession):
             # 返回: {
             #     'errorCode': ..., # 验证通过时为1
             #     'errorMsg': ... # 验证通过时为'success'
-	    # }
+            # }
         page = BeautifulSoup(page, "lxml")
         form = page.findChild(attrs={'id': 'pwdFromId'})
         params = parse_form_hidden_inputs(form)
