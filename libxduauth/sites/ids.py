@@ -27,7 +27,7 @@ class IDSSession(AuthSession):
         ).text
 	is_need_captcha = self.get(
             'https://ids.xidian.edu.cn/authserver/checkNeedCaptcha.htl',
-            params={'username': username, '_': int(time.time() * 1000)}
+            params={'username': username, '_': str(int(time.time() * 1000))}
         ).json()['isNeed']
 	if is_need_captcha:
             captcha = self.get(
