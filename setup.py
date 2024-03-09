@@ -11,7 +11,7 @@ setuptools.setup(
     description="login utilities for XDU",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/xdlinux/libxdauth",
+    url="https://github.com/xdlinux/libxduauth",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
