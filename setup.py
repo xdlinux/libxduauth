@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="libxduauth",
-    version="1.8.0",
+    version="1.8.1",
     author="Frank",
     author_email="frankli0324@hotmail.com",
     description="login utilities for XDU",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/xdlinux/libxdauth",
+    url="https://github.com/xdlinux/libxduauth",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
