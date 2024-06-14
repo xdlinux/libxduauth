@@ -3,7 +3,6 @@ from base64 import b64encode, b64decode
 from io import BytesIO
 from re import search
 
-from http.cookiejar import Cookie
 import requests
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
@@ -44,22 +43,12 @@ class XKSession(AuthSession):
                 self.user['electiveBatchList']
             ))
             self.persist('batch', json.dumps(self.current_batch))
-            cookie_auth = None
-            for c in self.cookies:
-                if c.name == "token":
-                    cookie_auth = Cookie(
-                        c.version, "Authorization", c.value, None, False,
-                        c.domain, False, False, c.path, True, False,
-                        None, True, None, None, {'HttpOnly': 'None'}
-                    )
-                    break
-            if not cookie_auth:
-                raise RuntimeError('Cookie \'token\' Non-Existent')
-            self.cookies.set_cookie(cookie_auth)
+            cookie_token = next(c for c in self.cookies if c.name == "token")
+            self.persist("Authorization", cookie_token.value)
             self.get(self.BASE + '/elective/grablessons', params={
                 'batchId': self.current_batch['code'],
             })  # wierd, yet mandatory.
-            self.headers.update({'Authorization': cookie_auth.value})
+            self.headers.update({'Authorization': cookie_token.value})
 
     def persist(self, name, value):
         self.cookies.set_cookie(requests.cookies.create_cookie(
