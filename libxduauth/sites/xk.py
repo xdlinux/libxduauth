@@ -43,12 +43,12 @@ class XKSession(AuthSession):
                 self.user['electiveBatchList']
             ))
             self.persist('batch', json.dumps(self.current_batch))
-            cookies = requests.utils.dict_from_cookiejar(self.cookies)
-            self.cookies.update({'Authorization': cookies['token']})
+            cookie_token = next(c for c in self.cookies if c.name == "token")
+            self.persist("Authorization", cookie_token.value)
             self.get(self.BASE + '/elective/grablessons', params={
                 'batchId': self.current_batch['code'],
             })  # wierd, yet mandatory.
-            self.headers.update({'Authorization': cookies['token']})
+            self.headers.update({'Authorization': cookie_token.value})
 
     def persist(self, name, value):
         self.cookies.set_cookie(requests.cookies.create_cookie(
