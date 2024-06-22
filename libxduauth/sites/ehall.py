@@ -5,13 +5,11 @@ from ..AuthSession import AuthSession
 class EhallSession(IDSSession):
     cookie_name = 'ehall'
 
-    def __init__(self, username, password, *args, **kwargs):
+    def __init__(self, username=None, password=None, **kwargs):
+        kwargs['target'] = 'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html'
         AuthSession.__init__(self, f'{self.cookie_name}_{username}')
         if not self.is_logged_in():
-            super().__init__(
-                'http://ehall.xidian.edu.cn/login?service=http://ehall.xidian.edu.cn/new/index.html',
-                username, password, *args, **kwargs
-            )
+            super().__init__(username=username, password=password, **kwargs)
 
     def use_app(self, app_id):
         self.get('http://ehall.xidian.edu.cn//appShow', params={
