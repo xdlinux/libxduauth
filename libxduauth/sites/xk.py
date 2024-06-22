@@ -39,8 +39,9 @@ class XKSession(AuthSession):
     captcha_solver = None
 
     def __init__(self, username, password, keyword='', captcha_solver=_captcha_solver):
-        if callable(captcha_solver):
-            self.captcha_solver = captcha_solver
+        if not callable(captcha_solver):
+            raise TypeError('``captcha_solver`` is not callable')
+        self.captcha_solver = captcha_solver
         super().__init__(f'{self.cookie_name}_{username}')
         self.username = username
         cookies = requests.utils.dict_from_cookiejar(self.cookies)
