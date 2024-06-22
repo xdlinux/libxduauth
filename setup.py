@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="libxduauth",
-    version="1.8.2",
+    version="2.0.1",
     author="Frank",
     author_email="frankli0324@hotmail.com",
     description="Login utilities for XDU",
