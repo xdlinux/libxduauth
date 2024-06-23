@@ -19,7 +19,7 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=[
-        "requests", "bs4", "pycryptodome",
+        "requests", "bs4", "lxml", "pycryptodome",
         "importlib-resources", "Pillow",
     ],
 )
