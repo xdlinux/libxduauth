@@ -130,14 +130,13 @@ class IDSSession(AuthSession):
 
     def login_username_finish(self, username, password):
         password = encrypt(password.encode(), self.__secrets['enc'].encode())
-        res = self.post(
+        return self.post(
             'http://ids.xidian.edu.cn/authserver/login',
             params={'service': self.target}, data=dict(
                 self.__secrets['params'],
                 **{'username': username, 'password': password}
             )
-        )
-        return res.status_code == 200
+        ).status_code == 200
 
     def login_dynamic_send_code(self, username):
         # send dynamic code to the username (phone number)
