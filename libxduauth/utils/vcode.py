@@ -1,38 +1,15 @@
-class Processor:
-    def __init__(self, img):
-        self.img = img.convert('L')
-        self.img_arr = self.img.load()
-        self.paint()
-
-    DX = [1, 0, -1, 0]
-    DY = [0, 1, 0, -1]
-
-    def paint(self):
-        w, h = self.img.size
-        visited = set()
-        q = []
-        q.append((0, 0, 255))
-        while q:
-            x, y, value = q.pop()
-            if x < 0 or y < 0 or x >= w or y >= h or \
-                    (x, y) in visited:
-                continue
-            visited.add((x, y))
-            for i in range(4):
-                try:
-                    pixel = self.img_arr[x + self.DX[i], y + self.DY[i]]
-                except IndexError:
-                    continue
-                if abs(pixel - self.img_arr[x, y]) > 5:
-                    q.append((x + self.DX[i], y + self.DY[i], 255 - value))
-                else:
-                    q.append((x + self.DX[i], y + self.DY[i], value))
-            self.img_arr[x, y] = value
-
-
-def _process_vcode(img):
-    p = Processor(img)
-    return p.img
+def _image_binarize(img, bg_color = 255, text_color = 0):
+    # binarize an captcha image for cli view
+    # color atop every column is treated as its background color
+    # other different colors are filled to text_color
+    img = img.convert('L')
+    pxl = img.load()
+    w, h = img.size
+    for x in range(w):
+        top_color = pxl[x, 0]
+        for y in range(h):
+            pxl[x, y] = bg_color if pxl[x, y] == top_color else text_color
+    return img
 
 
 def _image_to_ascii(img, size = (80, 16), invert_pallete = True):
