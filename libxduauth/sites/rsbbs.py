@@ -5,16 +5,16 @@ from bs4 import BeautifulSoup
 
 from ..AuthSession import AuthSession
 from ..utils.page import parse_form_hidden_inputs
-from ..utils.vcode import _process_vcode, _image_to_ascii
+from ..utils.vcode import _image_binarize, _image_to_ascii
 
 
 def _captcha_solver(img):
-    _process_vcode(img).show()
+    img.show()
     return input('Input captcha vcode: ')
 
 
 def _captcha_solver_cli(img):
-    print(_image_to_ascii(_process_vcode(img)))
+    print(_image_to_ascii(_image_binarize(img), (80, 21)))
     return input('Input captcha vcode: ')
 
 
