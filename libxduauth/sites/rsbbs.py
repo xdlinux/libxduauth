@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from ..AuthSession import AuthSession
 from ..utils.page import parse_form_hidden_inputs
-from ..utils.vcode import _process_vcode
+from ..utils.vcode import get_solver
 
 
 class RSBBSSession(AuthSession):
@@ -26,13 +26,9 @@ class RSBBSSession(AuthSession):
         soup = BeautifulSoup(login.text, 'lxml')
 
         img = soup.find('img', {'class': 'seccodeimg'}).get('src')
-        img = _process_vcode(Image.open(
-            BytesIO(self.get(f'http://{self.HOST}/{img}', headers={
-                'Referer': login.url
-            }).content)
-        ))
-        img.show()
-        vcode = input('验证码：')
+        vcode = get_solver('rsbbs.xidian.edu.cn')(self.get(f'http://{self.HOST}/{img}', headers={
+            'Referer': login.url
+        }).content)
         page = self.post(
             f'http://{self.HOST}/' +
             soup.find('form', id='loginform').get('action'), data=dict(

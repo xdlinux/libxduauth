@@ -1,13 +1,12 @@
 import json
 from base64 import b64encode, b64decode
-from io import BytesIO
 from re import search
 
 import requests
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
-from PIL import Image
 
+from ..utils.vcode import get_solver
 from ..AuthSession import AuthSession
 
 
@@ -70,10 +69,7 @@ class XKSession(AuthSession):
 
         # show captcha
         captcha_img = captcha['captcha'][22:]  # data:image/png;base64,
-        Image.open(BytesIO(b64decode(captcha_img))).show()
-
-        # TODO:input function shouldn't exist here
-        captcha_code = input('验证码：')
+        captcha_code = get_solver('xk.xidian.edu.cn')(b64decode(captcha_img))
 
         login_resp = self.post(f'{self.BASE}/auth/login', data={
             'loginname': username,
