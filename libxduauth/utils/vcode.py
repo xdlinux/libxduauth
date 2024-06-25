@@ -1,35 +1,32 @@
-class Processor:
-    def __init__(self, img):
-        self.img = img.convert('L')
-        self.img_arr = self.img.load()
-        self.paint()
-
-    DX = [1, 0, -1, 0]
-    DY = [0, 1, 0, -1]
-
-    def paint(self):
-        w, h = self.img.size
-        visited = set()
-        q = []
-        q.append((0, 0, 255))
-        while q:
-            x, y, value = q.pop()
-            if x < 0 or y < 0 or x >= w or y >= h or \
-                    (x, y) in visited:
-                continue
-            visited.add((x, y))
-            for i in range(4):
-                try:
-                    pixel = self.img_arr[x + self.DX[i], y + self.DY[i]]
-                except IndexError:
-                    continue
-                if abs(pixel - self.img_arr[x, y]) > 5:
-                    q.append((x + self.DX[i], y + self.DY[i], 255 - value))
-                else:
-                    q.append((x + self.DX[i], y + self.DY[i], value))
-            self.img_arr[x, y] = value
+from base64 import b64decode
+from typing import Callable
+from io import BytesIO
+from PIL import Image
 
 
-def _process_vcode(img):
-    p = Processor(img)
-    return p.img
+def _default_solver(data):
+    Image.open(BytesIO(data)).show()
+    return input('验证码: ')
+
+
+def _ids_solver(data):
+    # data is {
+    #     'bigImage': ..., # 背景图(base64)
+    #     'smallImage': ..., # 滑块图(base64)
+    #     'tagWidth": 93, # 无用, 恒93
+    #     'yHeight': 0 # 无用, 恒0
+    # }
+    img = Image.open(BytesIO(b64decode(data['bigImage'])))
+    img.show()
+
+    # 输入背景图左侧到滑块目标位置左侧的宽度
+    return int(input('滑块位移: ')) * 280 // img.width
+
+
+_solvers = {
+    'ids.xidian.edu.cn': _ids_solver,
+}
+
+
+def get_solver(key) -> Callable:
+    return _solvers.get(key, _default_solver)
