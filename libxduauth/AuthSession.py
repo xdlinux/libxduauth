@@ -9,7 +9,7 @@ class AuthSession(Session):
     def __init__(self, name=None, cookies={}, headers={}):
         cookie_name = name if name else self.cookie_name
         self.cookie_path = os.path.expanduser(
-            os.path.join('~', '.xduauth', 'cookies', cookie_name)
+            os.path.join('~', '.cache', 'xduauth', 'cookies', cookie_name)
         )
         os.makedirs(os.path.dirname(self.cookie_path), exist_ok=True)
         if not cookies and hasattr(self, 'cookies'):
