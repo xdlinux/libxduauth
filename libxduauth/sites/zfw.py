@@ -24,7 +24,7 @@ class ZFWSession(AuthSession):
         headers = {
             **self.headers,
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-Token': form.find('input', id='_csrf-8800').get('value')
+            'X-CSRF-Token': form.find('input', attrs={'name': '_csrf-8800'}).get('value')
         }
         enc_password = rsa_encrypt_by_pkcs1(
             form.find('input', id='public').get('value'), password
@@ -53,4 +53,4 @@ class ZFWSession(AuthSession):
     def is_logged_in(self):
         return self.get(
             f'{self.BASE}/login', allow_redirects=False
-        ).status_code != 302
+        ).status_code == 302
